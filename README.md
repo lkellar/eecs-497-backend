@@ -1,0 +1,170 @@
+# EECS 497 Backend
+
+we gotta think of a name for this project
+
+## Setup
+
+## TODO
+- support multiple users editing lang
+- flashcard support (though could this just be front-end, e.g. load all the words and just do it there)
+- quiz support
+- the lesson plan lesson structure?
+- export
+
+## API Routes
+Supports the following routes. All POST requests take JSON bodies.
+
+### `/auth/register` (POST)
+
+Register a new user with email and password. Returns a session cookie if successful. Email must be unique
+
+#### Body (JSON)
+* `email` (string)
+* `password` (string)
+
+```json
+{
+    "email": "john@umich.edu",
+    "password": "jficerwjisfjiedjf"
+}
+```
+
+#### Response
+* Returns `201 Created` if successful registration, along with a valid session cookie
+* Returns `400 Bad Request` if there's an issue in creation, along with an `error` attribute explaining the issue.
+
+```json
+{
+    "error": "User with email address already exists"
+}
+```
+
+### `/auth/login` (POST)
+
+Login a user with email and password. Returns a session cookie if successful
+
+#### Body (JSON)
+* `email` (string)
+* `password` (string)
+
+```json
+{
+    "email": "john@umich.edu",
+    "password": "jficerwjisfjiedjf"
+}
+```
+
+#### Response
+* Returns `200 OK` if successful login, along with a valid session cookie.
+* Returns `400 Bad Request` if there's invalid input/body.
+* Returns `401 Unauthorized` for invalid login.
+
+### `/auth/logout` (POST)
+
+Logs out user if logged in. No body required
+
+#### Response
+* Returns `200 OK` if successful logout
+* Returns `401 Unauthorized` if user wasn't logged in to begin with.
+
+### `/lang/create` (POST) (Login Required)
+
+Create a language (required before any lessons or words can be imported)
+
+#### Body (JSON)
+* `name` (string): Name of the language (must be unique)
+
+```json
+{
+    "name": "Cherokee"
+}
+```
+
+#### Response
+* Returns `201 OK` if successful creation, along with an id for the language.
+
+```json
+{
+   "name": "Cherokee",
+   "id": "3382592932"
+}
+```
+
+* Returns `400 Bad Request` if unsuccessful, along with an `error` attribute explaining the issue
+
+```json
+{
+    "error": "Language called Cherokee already exists"
+}
+```
+
+### `/lang/import` (POST) (Login Required)
+
+Imports new word(s) to a language. User must be the maintainer of a language to import words.
+
+#### Body (JSON List)
+* `lang_id` (int): Id for the associated language
+* `words` (array): A JSON array of objects meeting the following format:
+    * `english` (string): The word in English
+    * `translation` (string): The word translated to the native language
+    * `definition` (string) (optional): The definition of the word in English
+    
+```json
+{
+    "lang_id": 3382592932,
+    "words": [
+        {
+            "english": "dog",
+            "translation": "ᎩᏟ",
+        },
+        {
+            "english": "catfish",
+            "translation": "ᎤᏍᏉᎴᏆ",
+            "definition": "A group of fish named for their prominent barbels, resembling a cat's whiskers"
+        }
+    ]
+}
+```
+
+#### Response
+* Returns `201 Created` upon successful creation
+* Returns `400 Bad Request` along with an `error` attribute explaining the issue
+
+```json
+{
+    "error": "missing 'english' attribute on an entry"
+}
+```
+
+### `/lang` (GET)
+
+Takes no arguments, just returns a list of active languages
+
+```json
+[
+    {
+       "name": "Cherokee",
+       "id": "3382592932",
+       "maintainer": "john@umich.edu"
+    }
+]
+```
+
+### `/lang/words/<lang_id>` (GET)
+
+Returns all words associated with a language.
+
+```json
+[
+    {
+        "english": "dog",
+        "translation": "ᎩᏟ",
+        "definition": null
+    },
+    {
+        "english": "catfish",
+        "translation": "ᎤᏍᏉᎴᏆ",
+        "definition": "A group of fish named for their prominent barbels, resembling a cat's whiskers"
+    }
+]
+```
