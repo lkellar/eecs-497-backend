@@ -20,6 +20,12 @@ echo 'export PATH="/opt/homebrew/opt/libpq/bin:$PATH"' >> ~/.zshrc
 echo 'export PATH="/usr/local/opt/libpq/bin:$PATH"' >> ~/.zshrc
 ```
 
+Run the following to start the db (on Homebrew):
+
+```bash
+brew services start postgresql@17
+```
+
 Then, run the following commands to create the database:
 
 ```bash

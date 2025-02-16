@@ -311,3 +311,4 @@ pyrightconfig.json
 
 env.sh
 .nova
+*.paw
