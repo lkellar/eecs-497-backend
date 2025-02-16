@@ -4,7 +4,38 @@ we gotta think of a name for this project
 
 ## Setup
 
+Setting up on local isn't too tricky. (Eventually we'll get this hosted probably) To run locally, you'll need Postgres (I'm using Postgres 17), which you can install with [Homebrew](https://brew.sh) on macOS
+
+```bash
+brew install postgresql@17 libpq
+```
+
+You'll probably need to add the Postgres utils to your PATH (skip this step if `psql` doesn't say something like "command not found"):
+
+```bash
+# if using Apple Silicon (M1 or later)
+echo 'export PATH="/opt/homebrew/opt/libpq/bin:$PATH"' >> ~/.zshrc
+
+# if using Intel x64
+echo 'export PATH="/usr/local/opt/libpq/bin:$PATH"' >> ~/.zshrc
+```
+
+Then, run the following commands to create the database:
+
+```bash
+psql -d postgres # which should open the postgres shell
+CREATE DATABASE eecs497_backend;
+\q # to quit
+```
+
+and that should setup the db locally (yay!).
+
+Then, clone the repo, setup your python virtualenv, and install dependencies with `pip install -r requirements.txt`.
+
+Then, just run `flask --app backend --debug run` and the server should be running! (let me know if it doesn't work)
+
 ## TODO
+- deploy to AWS or something hosted
 - support multiple users editing lang
 - flashcard support (though could this just be front-end, e.g. load all the words and just do it there)
 - quiz support
