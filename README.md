@@ -38,6 +38,8 @@ and that should setup the db locally (yay!).
 
 Then, clone the repo, setup your python virtualenv, and install dependencies with `pip install -r requirements.txt`.
 
+Create an `env.sh` setting an environment variable like `export EECS497_BACKEND_SECRET_KEY='SOEMTHING'`. A suitable key can be generated with `python -c 'import secrets; print(secrets.token_hex())'`. Then `source env.sh` or run it to set that env variable.
+
 Then, just run `flask --app backend --debug run` and the server should be running! (let me know if it doesn't work)
 
 ## TODO
