@@ -51,6 +51,14 @@ Then, just run `flask --app backend --debug run` and the server should be runnin
 ## API Routes
 Supports the following routes. All POST requests take JSON bodies.
 
+All errors will return a JSON response with a message describing the rror:
+
+```json
+{
+   "error": "This is the problem with the request"
+}
+```
+
 ### `/auth/register` (POST)
 
 Register a new user with email and password. Returns a session cookie if successful. Email must be unique
