@@ -40,7 +40,9 @@ Then, clone the repo, setup your python virtualenv, and install dependencies wit
 
 Create an `env.sh` setting an environment variable like `export EECS497_BACKEND_SECRET_KEY='SOEMTHING'`. A suitable key can be generated with `python -c 'import secrets; print(secrets.token_hex())'`. Then `source env.sh` or run it to set that env variable.
 
-Then, just run `flask --app backend --debug run` and the server should be running! (let me know if it doesn't work)
+Then, just run `flask --app backend --debug run --cert=adhoc` and the server should be running! (let me know if it doesn't work).
+
+When you first try to access it, you may get a scary warning about invalid cert. You can just ignore it (since we're having it use a fake SSL cert locally so logins work).
 
 ## TODO
 - deploy to AWS or something hosted
@@ -61,13 +63,27 @@ All errors will return a JSON response with a message describing the rror:
 }
 ```
 
+### `/auth/me` (GET)
+
+Check if a user is logged in / session cookie is valid. If successful, logged in email is returned
+
+#### Response
+* Returns `200 Created` if logged in, along with the email address
+* Returns `401 Unauthorized` if logged out or not valid auth
+
+```json
+{
+    "email": "john@umich.edu"
+}
+```
+
 ### `/auth/register` (POST)
 
 Register a new user with email and password. Returns a session cookie if successful. Email must be unique
 
 #### Body (JSON)
 * `email` (string)
-* `password` (string)
+* `password` (string) Must be minimum 8 characters
 
 ```json
 {
@@ -145,12 +161,11 @@ Create a language (required before any lessons or words can be imported)
 }
 ```
 
-### `/lang/import` (POST) (Login Required)
+### `/lang/<lang_id>/import` (POST) (Login Required)
 
-Imports new word(s) to a language. User must be the maintainer of a language to import words.
+Imports new word(s) to a language.
 
 #### Body (JSON List)
-* `lang_id` (int): Id for the associated language
 * `words` (array): A JSON array of objects meeting the following format:
     * `english` (string): The word in English
     * `translation` (string): The word translated to the native language
@@ -158,7 +173,6 @@ Imports new word(s) to a language. User must be the maintainer of a language to 
     
 ```json
 {
-    "lang_id": 3382592932,
     "words": [
         {
             "english": "dog",
@@ -191,27 +205,32 @@ Takes no arguments, just returns a list of active languages
 [
     {
        "name": "Cherokee",
-       "id": "3382592932",
-       "maintainer": "john@umich.edu"
+       "id": 3382592932
     }
 ]
 ```
 
-### `/lang/words/<lang_id>` (GET)
+### `/lang/<lang_id>` (GET)
 
-Returns all words associated with a language.
+Returns all words and data associated with a language.
 
 ```json
-[
-    {
-        "english": "dog",
-        "translation": "ᎩᏟ",
-        "definition": null
-    },
-    {
-        "english": "catfish",
-        "translation": "ᎤᏍᏉᎴᏆ",
-        "definition": "A group of fish named for their prominent barbels, resembling a cat's whiskers"
-    }
-]
+{
+   "language": {
+      "id": 85435345345,
+      "name": "Cherokee"
+   },
+   "words": [
+      {
+           "english": "dog",
+           "translation": "ᎩᏟ",
+           "definition": null
+       },
+       {
+           "english": "catfish",
+           "translation": "ᎤᏍᏉᎴᏆ",
+           "definition": "A group of fish named for their prominent barbels, resembling a cat's whiskers"
+       }
+   ]
+}
 ```

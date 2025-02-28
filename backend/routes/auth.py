@@ -3,7 +3,13 @@ from backend.routes import build_error
 from backend.models import User
 from flask import request, abort, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_required, logout_user, login_user
+from flask_login import login_required, logout_user, login_user, current_user
+
+# if logged in, return the user's email address
+@app.route('/auth/me', methods=["GET"])
+@login_required
+def check_auth():
+    return jsonify({"email": current_user.email}), 200
 
 @app.route('/auth/register', methods=["POST"])
 def register_account():
@@ -15,6 +21,10 @@ def register_account():
     
     email = body['email']
     password = body['password']
+    
+    if len(password) < 8:
+        return build_error("Password must be at least 8 characters", 400)
+    
     if User.query.filter_by(email=email).first():
         return build_error("User with email address already exists", 400)
     
@@ -26,7 +36,7 @@ def register_account():
     
     # return 201 Created upon sucessful response
     return "", 201
-    
+
 @app.route('/auth/login', methods=['POST'])
 def login_account():
     body = request.get_json()

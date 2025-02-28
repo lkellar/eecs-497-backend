@@ -2,6 +2,7 @@ import flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from flask_login import LoginManager
+from flask_cors import CORS
 
 class Base(DeclarativeBase):
     pass
@@ -11,6 +12,14 @@ db = SQLAlchemy(model_class=Base)
 login_manager = LoginManager()
 
 app = flask.Flask(__name__)
+
+if app.debug:
+    # disable cors restrictions when on debug mode
+    CORS(app, supports_credentials=True)
+    app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+    app.config['REMEMBER_COOKIE_SAMESITE'] = 'None'
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['REMEMBER_COOKIE_SECURE'] = True
 
 app.config.from_object('backend.config')
 db.init_app(app)

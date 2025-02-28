@@ -28,17 +28,17 @@ def create_language():
     db.session.commit()
     return jsonify({"id": new_language.id, "name": new_language.name})
 
-@app.route('/lang/import', methods=['POST'])
+
+@app.route('/lang/<int:lang_id>/import', methods=['POST'])
 @login_required
-def import_words():
+def import_words(lang_id: int):
     body = request.get_json()
     if body == None:
         return build_error("No JSON body provided", 400)
-    if 'lang_id' not in body or 'words' not in body:
-        return build_error("lang_id and words must be provided", 400)
+    if 'words' not in body:
+        return build_error("words must be provided", 400)
     
     words = body['words']
-    lang_id = body['lang_id']
     
     lang = Language.query.filter_by(id=lang_id).first()
     
@@ -56,14 +56,22 @@ def import_words():
     db.session.commit()
     return '', 201
 
-@app.route('/lang/words/<int:lang_id>')
-def retrieve_words(lang_id: int):
-    words = Word.query.filter_by(lang_id=lang_id).all()
+@app.route('/lang/<int:lang_id>')
+def retrieve_lang(lang_id: int):
+    lang = Language.query.filter_by(id=lang_id).first()
     
     words = [{
         "english": word.english,
         "translation": word.translation,
         "definition": word.definition
-    } for word in words]
+    } for word in lang.words]
     
-    return words
+    response = {
+        "language": {
+            'id': lang.id,
+            'name': lang.name
+        },
+        'words': words
+    }
+    
+    return jsonify(response)
