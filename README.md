@@ -149,7 +149,7 @@ Create a language (required before any lessons or words can be imported)
 ```json
 {
    "name": "Cherokee",
-   "id": "3382592932"
+   "id": 3382592932
 }
 ```
 
@@ -212,7 +212,7 @@ Takes no arguments, just returns a list of active languages
 
 ### `/lang/<lang_id>` (GET)
 
-Returns all words and data associated with a language.
+Returns all words, lessons, and data associated with a language.
 
 ```json
 {
@@ -231,6 +231,85 @@ Returns all words and data associated with a language.
            "translation": "ᎤᏍᏉᎴᏆ",
            "definition": "A group of fish named for their prominent barbels, resembling a cat's whiskers"
        }
+   ],
+   "lessons": [
+      {
+         "title": "Basic Grammar",
+         "id": 3234324324
+      }
    ]
+}
+```
+
+### `/lang/<lang_id>/lesson` (POST)
+
+Creates a new lesson and returns the lesson id.
+
+#### Body (JSON)
+* `title` (string)
+* `text` (string): Primary text of lesson. Images can be encoded in Markdown format `![image alt text](https://lkellar.org/img/pippinGrass.jpg)`
+
+    
+```json
+{
+    "title": "Basic Grammar",
+    "text": "Basic Grammar follows the rules from this picture: ![grammar rules](https://example.com/grammar.jpg)"
+}
+```
+
+#### Response
+* Returns `201 Created` upon successful creation, along with a language id
+
+```json
+{
+   "id": 3382592932
+}
+```
+
+* Returns `400 Bad Request` along with an `error` attribute explaining the issue
+
+```json
+{
+    "error": "missing 'text' attribute"
+}
+```
+
+### `/lang/<lang_id>/lesson/<lesson_id>` (GET)
+
+Fetch a lesson from its ID
+
+#### Response
+
+Returns 200 and the following if found, 404 if not
+
+```json
+{
+   "id": 3382592932,
+   "title": "Basic Grammar",
+   "text": "Basic Grammar follows the rules from this picture: ![grammar rules](https://example.com/grammar.jpg)"
+}
+```
+
+### `/lang/<lang_id>/lesson/<lesson_id>` (POST)
+
+Update an existing lesson from its ID
+
+#### Body (JSON)
+
+```json
+{
+    "title": "Basic Grammar",
+    "text": "Basic Grammar follows the rules from this picture: ![grammar rules](https://example.com/grammar.jpg)"
+}
+```
+
+#### Response
+
+* Returns `200 OK` if successful
+* Returns `400 Bad Request` along with an `error` attribute explaining the issue
+
+```json
+{
+    "error": "missing 'text' attribute"
 }
 ```

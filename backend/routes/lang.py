@@ -1,5 +1,5 @@
 from backend import app, db
-from backend.models import Language, Word
+from backend.models import Language, Word, Lesson
 from backend.routes import build_error
 from flask import jsonify, request
 from flask_login import login_required
@@ -60,18 +60,88 @@ def import_words(lang_id: int):
 def retrieve_lang(lang_id: int):
     lang = Language.query.filter_by(id=lang_id).first()
     
+    if not lang:
+        return build_error(f'Language with id {lang_id} doesn\'t exist', 400)
+    
     words = [{
         "english": word.english,
         "translation": word.translation,
         "definition": word.definition
     } for word in lang.words]
     
+    lessons = [{
+        'title': lesson.title,
+        'id': lesson.id
+    } for lesson in lang.lessons]
+    
     response = {
         "language": {
             'id': lang.id,
             'name': lang.name
         },
-        'words': words
+        'words': words,
+        'lessons': lessons
     }
     
     return jsonify(response)
+
+@app.route('/lang/<int:lang_id>/lesson', methods=['POST'])
+@login_required
+def create_lesson(lang_id: int):
+    body = request.get_json()
+    if body == None:
+        return build_error("No JSON body provided", 400)
+    if 'title' not in body or 'text' not in body:
+        return build_error("'title' and 'text' must be provided", 400)
+    lang = Language.query.filter_by(id=lang_id).first()
+
+    if not lang:
+        return build_error(f'Language with id {lang_id} doesn\'t exist', 400)
+        
+    title = body['title']
+    text = body['text']
+        
+    new_lesson = Lesson(lang_id=lang.id, title=title, text=text)
+    db.session.add(new_lesson)
+    
+    # this will only commit the words to DB if all of them were successful
+    db.session.commit()
+    return jsonify({
+        'id': new_lesson.id
+    }), 201
+
+@app.route('/lang/<int:lang_id>/lesson/<int:lesson_id>', methods=['GET'])
+def fetch_lesson(lang_id: int, lesson_id: int):
+    lesson = Lesson.query.filter_by(id=lesson_id, lang_id=lang_id).first()
+    
+    if not lesson:
+        return build_error(f'Lesson doesn\'t exist', 400)
+    
+    
+    response = {
+        'title': lesson.title,
+        'text': lesson.text
+    }
+    
+    return jsonify(response)
+
+@app.route('/lang/<int:lang_id>/lesson/<int:lesson_id>', methods=['POST'])
+@login_required
+def update_lesson(lang_id: int, lesson_id: int):
+    body = request.get_json()
+    if body == None:
+        return build_error("No JSON body provided", 400)
+    if 'title' not in body or 'text' not in body:
+        return build_error("'title' and 'text' must be provided", 400)
+
+    lesson = Lesson.query.filter_by(id=lesson_id, lang_id=lang_id).first()
+    
+    if not lesson:
+        return build_error(f'Lesson doesn\'t exist', 400)
+    
+    lesson.text = body['text']
+    lesson.title = body['title']
+    
+    db.session.commit()
+    
+    return '', 200
