@@ -197,6 +197,20 @@ Imports new word(s) to a language.
 }
 ```
 
+### `/lang/<lang_id>/word/<word_id>` (DELETE) Login Required
+
+Delete a word from a language
+
+#### Response
+* Returns `200 OK` upon successful delete
+* Returns `400 Bad Request` or `404 Not Found` along with an `error` attribute explaining the issue
+
+```json
+{
+    "error": "invalid word id"
+}
+```
+
 ### `/lang` (GET)
 
 Takes no arguments, just returns a list of active languages
@@ -224,12 +238,14 @@ Returns all words, lessons, and data associated with a language.
       {
            "english": "dog",
            "translation": "ᎩᏟ",
-           "definition": null
+           "definition": null,
+           "id": 21
        },
        {
            "english": "catfish",
            "translation": "ᎤᏍᏉᎴᏆ",
-           "definition": "A group of fish named for their prominent barbels, resembling a cat's whiskers"
+           "definition": "A group of fish named for their prominent barbels, resembling a cat's whiskers",
+           "id": 500
        }
    ],
    "lessons": [

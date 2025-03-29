@@ -66,7 +66,8 @@ def retrieve_lang(lang_id: int):
     words = [{
         "english": word.english,
         "translation": word.translation,
-        "definition": word.definition
+        "definition": word.definition,
+        "id": word.id
     } for word in lang.words]
     
     lessons = [{
@@ -142,6 +143,19 @@ def update_lesson(lang_id: int, lesson_id: int):
     lesson.text = body['text']
     lesson.title = body['title']
     
+    db.session.commit()
+    
+    return '', 200
+
+@app.route('/lang/<int:lang_id>/word/<int:word_id>', methods=['DELETE'])
+@login_required
+def delete_word(lang_id: int, word_id: int):
+    word = Word.query.filter_by(id=word_id, lang_id=lang_id).first()
+    
+    if not word:
+        return build_error(f'Word can\'t be found', 404)
+    
+    db.session.delete(word)
     db.session.commit()
     
     return '', 200
