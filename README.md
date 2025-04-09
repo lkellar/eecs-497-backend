@@ -1,6 +1,4 @@
-# EECS 497 Backend
-
-we gotta think of a name for this project
+# Backend for SoleSpeaks (EECS497 Capstone Project)
 
 ## Setup
 
