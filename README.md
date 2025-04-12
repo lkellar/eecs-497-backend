@@ -1,6 +1,4 @@
-# EECS 497 Backend
-
-we gotta think of a name for this project
+# Backend for SoleSpeaks (EECS497 Capstone Project)
 
 ## Setup
 
@@ -41,6 +39,8 @@ Then, clone the repo, setup your python virtualenv, and install dependencies wit
 Create an `env.sh` setting an environment variable like `export EECS497_BACKEND_SECRET_KEY='SOEMTHING'`. A suitable key can be generated with `python -c 'import secrets; print(secrets.token_hex())'`. Then `source env.sh` or run it to set that env variable.
 
 Then, just run `flask --app backend --debug run --cert=adhoc` and the server should be running! (let me know if it doesn't work).
+
+Troubleshoot: if when you get `Error: Invalid value for '--cert':` at this point, check if flask is inside the virtual environment. If it's not, then reinstall flask inside the env and run `python -m flask --app backend --debug run --cert=adhoc` instead.
 
 When you first try to access it, you may get a scary warning about invalid cert. You can just ignore it (since we're having it use a fake SSL cert locally so logins work).
 
