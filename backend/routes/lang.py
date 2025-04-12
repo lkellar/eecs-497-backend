@@ -1,8 +1,9 @@
 from backend import app, db
 from backend.models import Language, Word, Lesson
 from backend.routes import build_error
-from flask import jsonify, request
+from flask import jsonify, request, Response
 from flask_login import login_required
+import json
 
 @app.route('/lang', methods=['GET'])
 def list_languages():
@@ -85,6 +86,40 @@ def retrieve_lang(lang_id: int):
     }
     
     return jsonify(response)
+    
+@app.route('/lang/<int:lang_id>/export')
+def export_lang(lang_id: int):
+    lang = Language.query.filter_by(id=lang_id).first()
+    
+    if not lang:
+        return build_error(f'Language with id {lang_id} doesn\'t exist', 400)
+    
+    words = [{
+        "english": word.english,
+        "translation": word.translation,
+        "definition": word.definition,
+        "id": word.id
+    } for word in lang.words]
+    
+    lessons = [{
+        'title': lesson.title,
+        'id': lesson.id,
+        'text': lesson.text
+    } for lesson in lang.lessons]
+    
+    response = {
+        "language": {
+            'id': lang.id,
+            'name': lang.name
+        },
+        'words': words,
+        'lessons': lessons
+    }
+    
+    return Response(json.dumps(response),
+        mimetype='application/json',
+        headers={'Content-Disposition': 'attachment;filename=export.json'}
+    )
 
 @app.route('/lang/<int:lang_id>/lesson', methods=['POST'])
 @login_required
