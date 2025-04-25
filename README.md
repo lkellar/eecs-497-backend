@@ -2,7 +2,7 @@
 
 ## Setup
 
-Setting up on local isn't too tricky. (Eventually we'll get this hosted probably) To run locally, you'll need Postgres (I'm using Postgres 17), which you can install with [Homebrew](https://brew.sh) on macOS
+Setting up on local isn't too tricky. To run locally, you'll need Postgres, which you can install with [Homebrew](https://brew.sh) on macOS
 
 ```bash
 brew install postgresql@17 libpq
@@ -43,15 +43,6 @@ Then, just run `flask --app backend --debug run --cert=adhoc` and the server sho
 Troubleshoot: if when you get `Error: Invalid value for '--cert':` at this point, check if flask is inside the virtual environment. If it's not, then reinstall flask inside the env and run `python -m flask --app backend --debug run --cert=adhoc` instead.
 
 When you first try to access it, you may get a scary warning about invalid cert. You can just ignore it (since we're having it use a fake SSL cert locally so logins work).
-
-## TODO
-- deploy to AWS or something hosted
-- support multiple users editing lang
-- flashcard support (though could this just be front-end, e.g. load all the words and just do it there)
-- quiz support
-- the lesson plan lesson structure?
-- export
-
 ## API Routes
 Supports the following routes. All POST requests take JSON bodies.
 
