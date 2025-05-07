@@ -6,20 +6,17 @@ from backend import db
 from typing import Optional, List
 
 class User(UserMixin, db.Model):
-    __tablename__ = "user"
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(unique=True)
     hashed_password: Mapped[str]
 
 class Language(db.Model):
-    __tablename__ = "language"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
     words: Mapped[List['Word']] = relationship('Word', cascade='all, delete-orphan', back_populates='language')
     lessons: Mapped[List['Lesson']] = relationship('Lesson', cascade='all, delete-orphan', back_populates='language')
 
 class Word(db.Model):
-    __tablename__ = "word"
     id: Mapped[int] = mapped_column(primary_key=True)
     lang_id: Mapped[int] = mapped_column(ForeignKey('language.id', ondelete='CASCADE'))
     language = relationship('Language', back_populates='words')
@@ -30,7 +27,6 @@ class Word(db.Model):
 # very basic lesson format of title and text
 # images can be embedded in lesson Markdown style
 class Lesson(db.Model):
-    __tablename__ = "lesson"
     id: Mapped[int] = mapped_column(primary_key=True)
     lang_id: Mapped[int] = mapped_column(ForeignKey('language.id', ondelete='CASCADE'))
     language = relationship('Language', back_populates='lessons')
